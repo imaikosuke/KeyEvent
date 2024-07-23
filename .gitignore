@@ -1,0 +1,43 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.o
+*.a
+*.log
+*.out
+*.class
+
+# Directories
+bin/
+obj/
+node_modules/
+vendor/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Fyne specific files
+fyne_settings.json
+
+# Go specific
+*.exe
+*.test
+*.out
+
+# Environment variables
+.env
+
+# User-specific files
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Application specific
+credentials.json
+token.json
+NotoSansJP-VariableFont_wght.ttf
