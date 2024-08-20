@@ -20,30 +20,50 @@ type colorButton struct {
 	colorID string
 }
 
+type customEntry struct {
+	widget.Entry
+}
+
+func newCustomEntry() *customEntry {
+	entry := &customEntry{}
+	entry.ExtendBaseWidget(entry)
+	return entry
+}
+
+func (e *customEntry) TypedRune(r rune) {
+	e.Entry.TypedRune(r)
+	e.Refresh()
+}
+
+func (e *customEntry) TypedKey(event *fyne.KeyEvent) {
+	e.Entry.TypedKey(event)
+	e.Refresh()
+}
+
 func SetupUI(window fyne.Window) {
-	titleEntry := widget.NewEntry()
-	titleEntry.SetPlaceHolder("Enter event title")
+	titleEntry := newCustomEntry()
+	titleEntry.SetPlaceHolder("イベントのタイトルを入力")
 
-	yearEntry := widget.NewEntry()
-	yearEntry.SetPlaceHolder("YYYY")
+	yearEntry := newCustomEntry()
+	yearEntry.SetPlaceHolder("年 (YYYY)")
 
-	monthEntry := widget.NewEntry()
-	monthEntry.SetPlaceHolder("MM")
+	monthEntry := newCustomEntry()
+	monthEntry.SetPlaceHolder("月 (MM)")
 
-	dayEntry := widget.NewEntry()
-	dayEntry.SetPlaceHolder("DD")
+	dayEntry := newCustomEntry()
+	dayEntry.SetPlaceHolder("日 (DD)")
 
-	startHourEntry := widget.NewEntry()
-	startHourEntry.SetPlaceHolder("HH")
+	startHourEntry := newCustomEntry()
+	startHourEntry.SetPlaceHolder("開始時 (HH)")
 
-	startMinuteEntry := widget.NewEntry()
-	startMinuteEntry.SetPlaceHolder("MM")
+	startMinuteEntry := newCustomEntry()
+	startMinuteEntry.SetPlaceHolder("開始分 (MM)")
 
-	endHourEntry := widget.NewEntry()
-	endHourEntry.SetPlaceHolder("HH")
+	endHourEntry := newCustomEntry()
+	endHourEntry.SetPlaceHolder("終了時 (HH)")
 
-	endMinuteEntry := widget.NewEntry()
-	endMinuteEntry.SetPlaceHolder("MM")
+	endMinuteEntry := newCustomEntry()
+	endMinuteEntry.SetPlaceHolder("終了分 (MM)")
 
 	colorOptions := []struct {
 		id    string
@@ -91,18 +111,18 @@ func SetupUI(window fyne.Window) {
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "Title", Widget: titleEntry},
-			{Text: "Year", Widget: yearEntry},
-			{Text: "Month", Widget: monthEntry},
-			{Text: "Day", Widget: dayEntry},
-			{Text: "Start Hour", Widget: startHourEntry},
-			{Text: "Start Minute", Widget: startMinuteEntry},
-			{Text: "End Hour", Widget: endHourEntry},
-			{Text: "End Minute", Widget: endMinuteEntry},
+			{Text: "タイトル", Widget: titleEntry},
+			{Text: "年", Widget: yearEntry},
+			{Text: "月", Widget: monthEntry},
+			{Text: "日", Widget: dayEntry},
+			{Text: "開始時", Widget: startHourEntry},
+			{Text: "開始分", Widget: startMinuteEntry},
+			{Text: "終了時", Widget: endHourEntry},
+			{Text: "終了分", Widget: endMinuteEntry},
 		},
 	}
 
-	submitButton := widget.NewButton("Submit", func() {
+	submitButton := widget.NewButton("送信", func() {
 		title := titleEntry.Text
 		date := fmt.Sprintf("%s-%s-%s", yearEntry.Text, monthEntry.Text, dayEntry.Text)
 		startTime := fmt.Sprintf("%s:%s", startHourEntry.Text, startMinuteEntry.Text)
@@ -110,10 +130,10 @@ func SetupUI(window fyne.Window) {
 
 		err := calendar.CreateEvent(title, date, startTime, endTime, selectedColor)
 		if err != nil {
-			statusLabel.SetText(fmt.Sprintf("Failed to create event: %v", err))
+			statusLabel.SetText(fmt.Sprintf("イベントの作成に失敗しました: %v", err))
 			log.Printf("Error: %v", err)
 		} else {
-			statusLabel.SetText("Event created successfully!")
+			statusLabel.SetText("イベントが正常に作成されました！")
 		}
 	})
 

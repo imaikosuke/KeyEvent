@@ -18,7 +18,21 @@ func GetClient(config *oauth2.Config) *http.Client {
 		tok = getTokenFromWeb(config)
 		saveToken(tokFile, tok)
 	}
-	return config.Client(context.Background(), tok)
+
+	ctx := context.Background()
+	// トークンの有効性をチェックし、必要に応じて更新
+	newToken, err := config.TokenSource(ctx, tok).Token()
+	if err != nil {
+		log.Printf("Error refreshing token: %v", err)
+		// トークンの更新に失敗した場合、新しいトークンを取得
+		newToken = getTokenFromWeb(config)
+	}
+
+	if newToken.AccessToken != tok.AccessToken {
+		saveToken(tokFile, newToken)
+	}
+
+	return config.Client(ctx, newToken)
 }
 
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
@@ -31,7 +45,7 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 		log.Fatalf("Unable to read authorization code: %v", err)
 	}
 
-	tok, err := config.Exchange(context.TODO(), authCode)
+	tok, err := config.Exchange(context.Background(), authCode)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web: %v", err)
 	}
@@ -51,7 +65,7 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 
 func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
-	f, err := os.Create(path)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Fatalf("Unable to cache oauth token: %v", err)
 	}
