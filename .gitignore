@@ -41,3 +41,6 @@ fyne_settings.json
 credentials.json
 token.json
 NotoSansJP-VariableFont_wght.ttf
+
+# Compiled File
+KeyEvent*
